@@ -35,7 +35,7 @@ class Process {
         if (this.blockingTimeNeeded === 0) {
             this.cpuTimeNeeded = Math.max(0, this.cpuTimeNeeded - time);
         } else {
-            this.queue.emitInterrupt(this. SchedulerInterrupt.PROCESS_BLOCKED);
+            this.queue.emitInterrupt(this, SchedulerInterrupt.PROCESS_BLOCKED);
             this.stateChanged = true;
         }
         
@@ -49,7 +49,7 @@ class Process {
     executeBlockingProcess(time) {
         this.blockingTimeNeeded = Math.max(0, this.blockingTimeNeeded - time);
         if (this.blockingTimeNeeded === 0) {
-            this.queue.emitInterrupt(this. SchedulerInterrupt.PROCESS_BLOCKED);
+            this.queue.emitInterrupt(this, SchedulerInterrupt.PROCESS_READY);
             this.stateChanged = true;
         }
     }

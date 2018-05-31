@@ -38,6 +38,7 @@ class Scheduler {
             this.runningQueues.forEach(queue => {
                 if (!queue.isEmpty()) {
                     queue.doCPUWork(interval);
+                    return;
                 }
             })
 
@@ -49,12 +50,10 @@ class Scheduler {
     }
 
     allQueuesEmpty() {
-        this.runningQueues.forEach(queue => {
-            if (!queue.isEmpty()) {
-                return false;
-            }
+        const runningQueuesEmpty = this.runningQueues.find(queue => {
+            return !queue.isEmpty();
         });
-        if (!this.blockingQueue.isEmpty) {
+        if (!this.blockingQueue.isEmpty() || !runningQueuesEmpty) {
             return false;
         }
         return true;
@@ -74,15 +73,16 @@ class Scheduler {
             case SchedulerInterrupt.PROCESS_READY:
                 this.addNewProcess(process);
             case SchedulerInterrupt.LOWER_PRIORITY:
+                const currentLevel = queue.getPriorityLevel();
                 if (queue.getQueueType === QueueType.BLOCKING_QUEUE) {
                     queue.enqueue(process);
                     break;
-                } 
-                else if (queue.getPriorityLevel() === PRIORITY_LEVELS - 1) {
+                }
+                else if (currentLevel === PRIORITY_LEVELS - 1) {
                     queue.enqueue(process);
                 } 
                 else {
-                    this.blockingQueue.enqueue(process);
+                    this.runningQueues[currentLevel+1].enqueue(process);
                 }
                 break;
             default:
